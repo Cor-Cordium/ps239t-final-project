@@ -1,0 +1,149 @@
+---
+title: "Assignment 10 - Textual Analysis CM"
+author: "Cory Merrill"
+date: "November 17, 2015"
+output: html_document
+---
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r}
+rm(list=ls())
+setwd("/Users/Orly/Documents/Computational Tools and Tech (F2015)/PS239T/11_text-analysis")
+library(tm) # loading recommended libraries
+library(RTextTools) 
+library(qdap)
+library(qdapDictionaries)
+library(dplyr) 
+library(ggplot2) 
+library(SnowballC) 
+library(entropy)
+
+getSources()
+getReaders()
+
+Pound <- Corpus(DirSource("Data/Final Project"))
+#Pound
+#as.character(Pound)
+
+getTransformations()
+
+Pound <- tm_map(Pound, content_transformer(tolower)) # convert all text to lower case
+#as.character(Pound)
+Pound <- tm_map(Pound, removePunctuation) # remove Puncturation
+#as.character(Pound)
+Pound <- tm_map(Pound, removeNumbers) # remove Numbers
+#as.character(Pound)
+Pound <- tm_map(Pound, removeWords, stopwords("english")) # remove common words
+#stopwords("english") # check out what was removed
+Pound <- tm_map(Pound, removeWords, c("gutenbergtm", "project", "gutenberg", "electron", "distribut", "foundat", "copyright", "access", "licen", "donat", "ebook", "copi", "archiv", "work")) #I removed terms that unrelated to the proper text
+#as.character(Pound)
+Pound <- tm_map(Pound, stripWhitespace) # strip white space
+#as.character(Pound)
+Pound <- tm_map(Pound, stemDocument) # stem the document
+#as.character(Pound)
+toSpace <- content_transformer(function(x, pattern) gsub(pattern, " ", x))
+#as.character(Pound)
+dtm <- DocumentTermMatrix(Pound) #making a document term matrix
+dtm
+dim(dtm)
+freq <- colSums(as.matrix(dtm)) #finding the most frequent terms
+length(freq)
+ord <- order(freq)
+freq[head(ord)] #taking a look at most frequent terma
+freq[tail(ord)] #also at least frequent
+head(table(freq),15) 
+tail(table(freq),15)
+plot(table(freq)) #taking a look at the distribution of frequency
+dtm.ordered <- dtm[,order(freq, decreasing = T)] #ordering terms by frequency
+findFreqTerms(dtm, lowfreq=20) 
+
+freq <- sort(colSums(as.matrix(dtm)),decreasing=TRUE)
+head(freq)
+
+wf <- data.frame(word=names(freq), freq=freq) #plotting the results
+head(wf)
+
+subset(wf, freq>20) %>% #plotting terms that occur over 20 times
+  ggplot (aes(word, freq)) +
+  geom_bar (stat ="identity") +
+  xlab("Term") + 
+  ylab("Frequency") + 
+  ggtitle("Most frequent terms in Ezra Pound's Personae")
+
+library(wordcloud) #creating word cloud of results
+set.seed(123)
+wordcloud(names(freq), freq, max.words=100, colors=brewer.pal(6,"Dark2"))
+
+dtm <- as.data.frame(as.matrix(dtm))
+names(Pound)
+write.csv(Pound,"Pound_Personae.csv") #writing to CSV
+
+#Now I will analyze distinctiveness across H.D.'s Sea Garden and Ezra Pound's Personae
+
+library(tm)
+library(RTextTools) # a machine learning package for text classification written in R
+library(SnowballC) # for stemming
+library(matrixStats)
+
+docs <- Corpus(DirSource("Data/Final Project"))
+docs
+dtm <- DocumentTermMatrix(docs,
+           control = list(stopwords = T,
+                          tolower = TRUE,
+                          removeNumbers = TRUE,
+                          removePunctuation = TRUE,
+                          stemming=TRUE))
+dim(dtm)
+
+# turn DTM into dataframe
+dtm.m <- as.data.frame(as.matrix(dtm))
+dtm.m[,1:5]
+
+#subsetting by author
+HD <- dtm.m[1,]
+Pound <- dtm.m[2,]
+# Sum word usage counts across all texts
+HD <- colSums(HD)
+Pound <- colSums(Pound)
+
+# Put those sums back into a dataframe
+df <- data.frame(rbind(HD,Pound))
+
+# subset df with non-zero entries
+df <- df[,HD>0 & Pound>0]
+# how many words are we left with?
+ncol(df)
+df[,1:10]
+
+#Differences in Averages
+# normalize into proportions
+rowTotals <- rowSums(df) #create column with row totals, total number of words per document
+head(rowTotals)
+df <- df/rowTotals #change frequencies to proportions
+df[,1:5] # how we have proportions.
+
+# get difference in proportions
+means.HD <- df[1,]
+means.Pound <- df[2,]
+score <- unlist(means.HD - means.Pound)
+
+# find words with highest difference
+score <- sort(score)
+head(score,15) # top 15 Pound words
+tail(score,15) # top 15 HD words
+
+means.all <- colMeans(df)
+
+score <- unlist((means.HD - means.Pound) / means.all)
+score <- sort(score)
+head(score,15) # top Pound words
+tail(score,15) # top HD words
+
+dtm.m <- as.data.frame(as.matrix(dtm))
+dtm.m[,1:5]
+```
+
+

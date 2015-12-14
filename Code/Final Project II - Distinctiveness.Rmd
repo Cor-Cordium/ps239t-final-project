@@ -1,0 +1,96 @@
+---
+title: "Final Project II - Distinctiveness"
+author: "Cory Merrill"
+date: "December 14, 2015"
+output: html_document
+---
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r}
+#Now I will analyze distinctiveness across T.S. Eliot's Prufrock, H.D.'s Sea Garden, and Ezra Pound's Personae. I will use a diadic approach to compare them, because I am more interested in the particular oppositions than one poet measured against the two as one generalized corpus.
+rm(list=ls())
+setwd("/Users/Orly/ps239t-final-project")
+library(tm)
+library(RTextTools) # a machine learning package for text classification written in R
+library(SnowballC) # for stemming
+library(matrixStats)
+
+docs <- Corpus(DirSource("Data"))
+docs
+dtm <- DocumentTermMatrix(docs,
+           control = list(stopwords = T,
+                          tolower = TRUE,
+                          removeNumbers = TRUE,
+                          removePunctuation = TRUE,
+                          stemming=TRUE))
+dim(dtm)
+
+# turn DTM into dataframe
+dtm.m <- as.data.frame(as.matrix(dtm))
+dtm.m[,1:3]
+
+#subsetting by author
+Eliot <- dtm.m[1,]
+HD <- dtm.m[2,]
+Pound <- dtm.m[3,]
+# Sum word usage counts for each poet
+Eliot <-colSums(Eliot)
+HD <- colSums(HD)
+Pound <- colSums(Pound)
+
+# Put those sums back into dataframe
+df <- data.frame(rbind(HD,Pound,Eliot))
+
+
+# subset df with non-zero entries
+df <- df[,HD>0 & Pound>0 & Eliot>0]
+# how many words are we left with?
+ncol(df)
+df[,1:10]
+
+#Differences in Averages
+# normalize into proportions
+rowTotals <- rowSums(df) #create column with row totals, total number of words per document
+head(rowTotals)
+df <- df/rowTotals #change frequencies to proportions
+df[,1:5] # how we have proportions.
+
+# get difference in proportions
+means.HD <- df[1,]
+means.Pound <- df[2,]
+means.Eliot <- df[3,]
+score1 <- unlist(means.HD - means.Pound)
+score2 <- unlist(means.Pound - means.Eliot)
+score3 <- unlist(means.Eliot - means.HD)
+
+# find words with highest difference
+score1 <- sort(score1)
+score2 <- sort(score2)
+score3 <- sort(score3)
+head(score1,15) # top 15 most distinct Pound words (v. HD)
+tail(score1,15) # top 15 HD words (v. Pound)
+head(score2,15) # top 15 Eliot words (v. Pound)
+tail(score2,15) # top 15 Pound words (v. Eliot)
+head(score3,15) # top 15 HD words (v. Eliot)
+tail(score3,15) # top 15 Eliot words (v. HD)
+
+
+#now taking a look at each compared to all
+means.all <- colMeans(df)
+
+scoreHD <- unlist((means.HD) / means.all)
+scoreHD <- sort(scoreHD)
+scoreP <- unlist((means.Pound) / means.all)
+scoreP <- sort(scoreP)
+scoreE <- unlist((means.Eliot) / means.all)
+scoreE <- sort(scoreE)
+tail(scoreHD,15) # most distinct HD words compared to all
+tail(scoreP,15) # most distinct Pound words compared to all
+tail(scoreE,15) # most distinct Eliot words compared to all
+
+#most distinct words for each
+```
+

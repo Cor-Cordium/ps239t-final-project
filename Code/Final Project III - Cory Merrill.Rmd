@@ -1,8 +1,8 @@
 ---
-title: "Final Project II"
+title: "Final Project III"
 author: "Cory Merrill"
 date: "December 11, 2015"
-output: pdf_document
+output: 
 ---
 
 This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
@@ -11,7 +11,9 @@ When you click the **Knit** button a document will be generated that includes bo
 
 
 ```{r}
-#PART 2: I would like to write a regular expression that identifies/helps me identify instances of simile in each collection
+#PART 3: I would like to write a regular expression that identifies/helps me identify instances of simile in each collection
+#I also do some preparation for future work with POS tagging for these three colleciton to measure their grammatical entropy (complexity) 
+#At the very end I share some code that is still in-progress for this project
 
 rm(list=ls())
 setwd("/Users/Orly/ps239t-final-project")
@@ -24,6 +26,7 @@ library(openNLP)
 
 #Import the data
 collections<-Corpus(DirSource("Data/POS Tagging"))
+collections <- tm_map(collections, content_transformer(tolower)) #coercing all to lowercase
 #Write a regular expression that identifies instances of like or as in each collection
 #I have restricted the expression to identify instances without enjambment (i.e. that falls on one line of a poem) for now 
 HDlike <- sapply(collections$content[[1]],function(str) grep(" like",str,value=TRUE))
@@ -34,18 +37,18 @@ Eliotlike<- sapply(collections$content[[3]],function(str) grep(" like",str,value
 Eliotas <- sapply(collections$content[[3]],function(str) grep(" as ",str,value=TRUE))
 
 #combine two cases (like and as) for each author
-
 HDsimile <- c(HDlike, HDas)
 Poundsimile <-c(Poundlike, Poundas)
 Eliotsimile <-c(Eliotlike, Eliotas)
 
-HDsimile
+HDsimile #taking a look at results
 Poundsimile
 Eliotsimile
 
+#To do: subset from these lists so that instances of non-figurative uses of as and like are removed.
 
 
-#POS Tagging
+#POS Tagging for the collections
 head(as.character(collections$content[[2]])) #checking the order
 #I am curious to see how sentence detection will work when applied to these collections of poetry
 # Combining sections of text for each collection
@@ -57,8 +60,6 @@ Eliot <-paste(collections$content[[3]], collapse = " ")
 sentencesE <- sent_detect(Eliot)
 sentencesH <- sent_detect(HD)
 sentencesP <- sent_detect(Pound)
-
-?pos_tags()
 
 posdE <- pos(sentencesE)
 posdH <- pos(sentencesH)
@@ -118,8 +119,7 @@ gramE.counts <- as.vector(table(gramE.listu))
 gramH.counts <- as.vector(table(gramH.listu))
 gramP.counts <- as.vector(table(gramP.listu))
 
-
-# Take a look
+# Take a look at the counts
 gramE.counts
 gramH.counts
 gramP.counts
@@ -140,63 +140,5 @@ ShannonH.entropy
 ShannonP.entropy
 
 ```
-#In-progress Approach A
-#split on spaces to create list of POS-tagged elements for each text
 
-#assigning vector of tagged sentences to variable 'taggedsentences'
-
-taggedsentencesE <-posdE$POStagged[,1]
-taggedsentencesH <-posdH$POStagged[,1]
-taggedsentencesP <-posdP$POStagged[,1]
-
-taggedsentencesP <- as.String(taggedsentencesP)
-taggedsentencesH <- as.String(taggedsentencesH)
-taggedsentencesE <- as.String(taggedsentencesE)
-HDlist <- strsplit(taggedsentencesH," ", fixed = TRUE)
-Eliotlist <- strsplit(taggedsentencesH," ", fixed = TRUE)
-Poundlist <- strsplit(taggedsentencesH," ", fixed = TRUE)
-
-#write a loop to iterate over the lists to identify all instances of "like" and "as" when they are classified as IN
-#The idea is that this kind of tagging can help identify instances of figurative expression, specifically simile
-
-#Approach B??
-#modifying code found on StackExchange+openNLP documentation that uses openNLP/NLP
-#extractPOS <- function(taggedsentencesE, "thisPOSregex") {
-  #x <- as.String(x)
-  #wordAnnotation <- annotate(x, list(Maxent_Sent_Token_Annotator(), Maxent_Word_Token_Annotator()))
-  #POSAnnotation <- annotate(x, Maxent_POS_Tag_Annotator(), wordAnnotation)
-  #POSwords <- subset(POSAnnotation, type == "word")
-  #tags <- sapply(POSwords$features, '[[', "POS")
-  #thisPOSindex <- grep(thisPOSregex, tags)
-  #tokenizedAndTagged <- sprintf("%s/%s", x[POSwords][thisPOSindex], tags[thisPOSindex])
-  #untokenizedAndTagged <- paste(tokenizedAndTagged, collapse = " ")
-  #untokenizedAndTagged
-#}
-?paste
-
-#extractPOS(taggedsentencesE, "IN")
-
-
-#In-progress approach C
-#require("NLP")
-#require("openNLP")
-#library(rJava)
-
-#args <- commandArgs(trailingOnly=TRUE)
-#s <- readLines(args)
-#s <- as.String(s)
-#sent_token_annotator <- Maxent_Sent_Token_Annotator()
-#sent_token_annotator
-#word_token_annotator <- Maxent_Word_Token_Annotator()
-#word_token_annotator
-#a2 <- annotate(s,
-           #list(sent_token_annotator,
-              #  word_token_annotator))
-#s[a2]
-#pos_tag_annotator <- Maxent_POS_Tag_Annotator()
-#pos_tag_annotator
-#a3 <- annotate(s, pos_tag_annotator, a2)
-#a3w <- subset(a3, type == "word")
-#tags <- sapply(a3w$features, "[[", "POS")
-#sprintf("%s/%s", s[a3w], tags)
 

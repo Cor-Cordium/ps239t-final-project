@@ -1,5 +1,5 @@
 ---
-title: "Assignment 10 - Textual Analysis CM"
+title: "Final Project I: Using Textual Analysis to analyze three collections of poetry"
 author: "Cory Merrill"
 date: "November 17, 2015"
 output: html_document
@@ -27,31 +27,31 @@ getReaders()
 Pound <- Corpus(DirSource("Data/Pound"))
 Eliot <- Corpus(DirSource("Data/TS_Eliot"))
 HD <- Corpus(DirSource("Data/HD"))
-Pound
-Eliot
-as.character(Pound)
-as.character(Eliot)
-as.character(HD)
+
+#as.character(Pound)
+#as.character(Eliot)
+#as.character(HD)
+
 
 getTransformations()
 
 #Clean data for Pound collection
 Pound <- tm_map(Pound, content_transformer(tolower)) # convert all text to lower case
-as.character(Pound)
+#as.character(Pound)
 Pound <- tm_map(Pound, removePunctuation) # remove Punctuation
-as.character(Pound)
+#as.character(Pound)
 Pound <- tm_map(Pound, removeNumbers) # remove Numbers
-as.character(Pound)
+#as.character(Pound)
 Pound <- tm_map(Pound, removeWords, stopwords("english")) # remove common words
 #stopwords("english") # check out what was removed
 Pound <- tm_map(Pound, removeWords, c("gutenbergtm", "project", "gutenberg", "electron", "distribut", "foundat", "copyright", "access", "licen", "donat", "ebook", "copi", "archiv", "work")) #I removed terms that unrelated to the proper text
-as.character(Pound)
+#as.character(Pound)
 Pound <- tm_map(Pound, stripWhitespace) # strip white space
-as.character(Pound)
+#as.character(Pound)
 Pound <- tm_map(Pound, stemDocument) # stem the document
-as.character(Pound)
+#as.character(Pound)
 toSpace <- content_transformer(function(x, pattern) gsub(pattern, " ", x))
-as.character(Pound)
+#as.character(Pound)
 dtm <- DocumentTermMatrix(Pound) #making a document term matrix
 dtm
 dim(dtm)
@@ -95,24 +95,24 @@ dtm2 <- DocumentTermMatrix(Eliot,
                           removePunctuation = TRUE,
                           stemming=TRUE))
 dim(dtm2)
-freq <- colSums(as.matrix(dtm2)) #finding the most frequent terms
-length(freq)
-ord <- order(freq)
-freq[head(ord)] #taking a look at most frequent terms
-freq[tail(ord)] #also at least frequent
-head(table(freq),15) 
-tail(table(freq),15)
-plot(table(freq)) #taking a look at the distribution of frequency
-dtm2.ordered <- dtm2[,order(freq, decreasing = T)] #ordering terms by frequency
+freq2 <- colSums(as.matrix(dtm2)) #finding the most frequent terms
+length(freq2)
+ord2 <- order(freq2)
+freq2[head(ord2)] #taking a look at least frequent terms
+freq2[tail(ord2)] #also at most frequent
+head(table(freq2),15) 
+tail(table(freq2),15)
+plot(table(freq2)) #taking a look at the distribution of frequency
+dtm2.ordered <- dtm2[,order(freq2, decreasing = T)] #ordering terms by frequency
 findFreqTerms(dtm2, lowfreq=9) 
 
-freq <- sort(colSums(as.matrix(dtm2)),decreasing=TRUE)
-head(freq)
+freq2 <- sort(colSums(as.matrix(dtm2)),decreasing=TRUE)
+head(freq2)
 
-wf <- data.frame(word=names(freq), freq=freq) #plotting the results
-head(wf)
+wf2 <- data.frame(word=names(freq2), freq=freq2) #plotting the results
+head(wf2)
 
-subset(wf, freq>9) %>% #plotting terms that occur over 9 times
+subset(wf2, freq>9) %>% #plotting terms that occur over 9 times
   ggplot (aes(word, freq)) +
   geom_bar (stat ="identity") +
   xlab("Term") + 
@@ -121,7 +121,7 @@ subset(wf, freq>9) %>% #plotting terms that occur over 9 times
 
 library(wordcloud) #creating word cloud of results
 set.seed(123)
-wordcloud(names(freq), freq, max.words=100, colors=brewer.pal(6,"Dark2"))
+wordcloud(names(freq2), freq2, max.words=100, colors=brewer.pal(7,"Dark2"))
 
 dtm2 <- as.data.frame(as.matrix(dtm2))
 names(Eliot)
@@ -135,24 +135,24 @@ dtm3 <- DocumentTermMatrix(HD,
                           removePunctuation = TRUE,
                           stemming=TRUE))
 dim(dtm3)
-freq <- colSums(as.matrix(dtm3)) #finding the most frequent terms
-length(freq)
-ord <- order(freq)
-freq[head(ord)] #taking a look at most frequent terms
-freq[tail(ord)] #also at least frequent
-head(table(freq),15) 
-tail(table(freq),15)
-plot(table(freq)) #taking a look at the distribution of frequency
-dtm3.ordered <- dtm3[,order(freq, decreasing = T)] #ordering terms by frequency
+freq3 <- colSums(as.matrix(dtm3)) #finding the most frequent terms
+length(freq3)
+ord3 <- order(freq3)
+freq3[head(ord3)] #taking a look at most frequent terms
+freq3[tail(ord3)] #also at least frequent
+head(table(freq3),15) 
+tail(table(freq3),15)
+plot(table(freq3)) #taking a look at the distribution of frequency
+#dtm3.ordered <- dtm3[,order(freq, decreasing = T)] #ordering terms by frequency
 findFreqTerms(dtm3, lowfreq=12) 
 
-freq <- sort(colSums(as.matrix(dtm3)),decreasing=TRUE)
-head(freq)
+freq3 <- sort(colSums(as.matrix(dtm3)),decreasing=TRUE) #ordering terms
+head(freq3)
 
-wf <- data.frame(word=names(freq), freq=freq) #plotting the results
-head(wf)
+wf3 <- data.frame(word=names(freq3), freq=freq3) #plotting the results
+head(wf3)
 
-subset(wf, freq>12) %>% #plotting terms that occur over 12 times
+subset(wf3, freq>12) %>% #plotting terms that occur over 12 times
   ggplot (aes(word, freq)) +
   geom_bar (stat ="identity") +
   xlab("Term") + 
@@ -161,94 +161,13 @@ subset(wf, freq>12) %>% #plotting terms that occur over 12 times
 
 library(wordcloud) #creating word cloud of results
 set.seed(123)
-wordcloud(names(freq), freq, max.words=100, colors=brewer.pal(6,"Dark2"))
+wordcloud(names(freq3), freq3, max.words=100, colors=brewer.pal(6,"Dark2"))
 
 dtm3 <- as.data.frame(as.matrix(dtm3))
 names(HD)
 write.csv(HD,"HD_SeaGarden.csv") #writing to CSV
 
-#Now I will analyze distinctiveness across T.S. Eliot's Prufrock, H.D.'s Sea Garden, and Ezra Pound's Personae. I will use a diadic approach to compare them, because I am more interested in the particular oppositions than one poet measured against the two as one generalized corpus.
-rm(list=ls())
-setwd("/Users/Orly/ps239t-final-project")
-library(tm)
-library(RTextTools) # a machine learning package for text classification written in R
-library(SnowballC) # for stemming
-library(matrixStats)
 
-docs <- Corpus(DirSource("Data"))
-docs
-dtm <- DocumentTermMatrix(docs,
-           control = list(stopwords = T,
-                          tolower = TRUE,
-                          removeNumbers = TRUE,
-                          removePunctuation = TRUE,
-                          stemming=TRUE))
-dim(dtm)
-
-# turn DTM into dataframe
-dtm.m <- as.data.frame(as.matrix(dtm))
-dtm.m[,1:3]
-
-#subsetting by author
-Eliot <- dtm.m[1,]
-HD <- dtm.m[2,]
-Pound <- dtm.m[3,]
-# Sum word usage counts for each poet
-Eliot <-colSums(Eliot)
-HD <- colSums(HD)
-Pound <- colSums(Pound)
-
-# Put those sums back into dataframe
-df <- data.frame(rbind(HD,Pound,Eliot))
-
-
-# subset df with non-zero entries
-df <- df[,HD>0 & Pound>0 & Eliot>0]
-# how many words are we left with?
-ncol(df)
-df[,1:10]
-
-#Differences in Averages
-# normalize into proportions
-rowTotals <- rowSums(df) #create column with row totals, total number of words per document
-head(rowTotals)
-df <- df/rowTotals #change frequencies to proportions
-df[,1:5] # how we have proportions.
-
-# get difference in proportions
-means.HD <- df[1,]
-means.Pound <- df[2,]
-means.Eliot <- df[3,]
-score1 <- unlist(means.HD - means.Pound)
-score2 <- unlist(means.Pound - means.Eliot)
-score3 <- unlist(means.Eliot - means.HD)
-
-# find words with highest difference
-score1 <- sort(score1)
-score2 <- sort(score2)
-score3 <- sort(score3)
-head(score1,15) # top 15 Pound words (v. HD)
-tail(score1,15) # top 15 HD words (v. Pound)
-head(score2,15) # top 15 Eliot words (v. Pound)
-tail(score2,15) # top 15 Pound words (v. Eliot)
-head(score3,15) # top 15 HD words (v. Eliot)
-tail(score3,15) # top 15 Eliot words (v. HD)
-
-
-#now taking a look at each compared to all
-means.all <- colMeans(df)
-
-scoreHD <- unlist((means.HD) / means.all)
-scoreHD <- sort(scoreHD)
-scoreP <- unlist((means.Pound) / means.all)
-scoreP <- sort(scoreP)
-scoreE <- unlist((means.Eliot) / means.all)
-scoreE <- sort(scoreE)
-tail(scoreHD,15) # top HD words
-tail(scoreP,15) # top Pound
-tail(scoreE,15) # top Eliot words
-
-#most distinct words for each
 
 
 ```

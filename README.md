@@ -2,42 +2,39 @@ This is a template you can use for your final project. Fill in each section with
 
 ## Short Description
 
-Give a short, 1-2 paragraph description of your project. Focus on the code, not the theoretical / substantive / academic side of things. 
+For my final project, I used textual analysis in R to examine three volumes of American modernist poetry. After preprocessing, I analyze each collection for term frequency and visualize the data with a bar plot in ggplot and a word cloud. I also created .csv files of each collection. For the second part of my project, I measured distinctiveness for each volume. I measured distinctiveness two ways: diadically, by comparing one volume to each other, and then each as a proportion to all the collections. 
+Next I explored regular expressions in R with the aim of writing regular expressions that could semi-automate the identification of similes in each volume. I wrote regular expressions to recognize every instance of "as" and "like" in the collections, grab the line the instance is contained in, and write it into a list. I now have three lists, one list for each collection. In the future, I plan to return to these expressions to modify them and make them more sophisticated. 
+Finally, I used POS-tagging to measure the grammatical entropy of each collection.
 
 ## Dependencies
 
-List what software your code depends on, as well as version numbers, like so:.
-
 1. R, version 3.1
-2. Python 2.7, Anaconda distribution.
-
-(In your code itself, includes commands that install required packages.)
 
 ## Files
 
-List all other files contained in the repo, along with a brief description of each one, like so:
-
 ### Data
 
-1. polity.csv: The PolityVI dataset, available here: http://www.systemicpeace.org/inscrdata.html
-2. nyt.csv: Contains data from the New York Times API collected via collect-nyt.ipynb . Includes information on all articles containing the term "Programmer Cat", 1980-2010.
-3. analysis-dataset.csv: The final Analysis Dataset derived from the raw data above. It includes country-year values for all UN countries 1980-2010, with observations for the following variables: 
-    - *ccode*: Correlates of War numeric code for country observation
-    - *year*: Year of observation
-    - *polity*: PolityVI score
-    - *nyt*: Number of New York Times articles about "Programmer Cat"
+All poetry collections were sourced from the gutenberg online archive.
+H.D. Sea Garden.txt
+HD_SeaGarden.csv
+Pound Personae.txt
+Pound_Personae.csv
+Eliot_Prufrock.csv
+TSEliot_Prufrock.txt
 
 ### Code
 
-1. 01_collect-nyt.py: Collects data from New York Times API and exports data to the file nyt.csv
-2. 02_merge-data.R: Loads, cleans, and merges the raw Polity and NYT datasets into the Analysis Dataset.
-2. 03_analysis.R: Conducts descriptive analysis of the data, producing the tables and visualizations found in the Results directory.
+1. Final Project - Cory Merrill.Rmd: pre-processes the poetry collections and analyzes each for term frequency, and produces the visualizations found in the results directory.
+2. Final Project II - Distinctiveness.Rmd: Analyzes the poetry collections for distinctiveness
+2. Final Project III - Cory Merrill.Rmd: Runs regular expressions to generate lists of the instances of "as" and "like" in the collections + the line they are contained in. POS tagging code analyzes the grammatical entropy of each collection.
 
 ### Results
 
-1. coverage-over-time.jpeg: Graphs the number of articles about each region over time.
-2. regression-table.txt: Summarizes the results of OLS regression, modelling *nyt* on a number of covariates.
+All results are saved as PDFs.
+1. Word clouds of each poetry collection (3 in total)
+2. Bar graphs of the most frequent terms in each collection (3 in total)
+3. POS plots for two collections (2 files total) 
 
 ## More Information
 
-Include any other details you think your user might need to reproduce your results. You may also include other information such as your contact information, credits, etc.
+Fur further questions or inquiries, I can be contacted at cory.merrill@berkeley.edu. 
